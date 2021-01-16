@@ -4,60 +4,7 @@ import LoopTree, {LoopTreeProperties} from './../src/LoopTree';
 import createFactoryDirectory, {isEqual as isEqualDirectory, DirectoryFixture} from './fixtures/items/directory.test';
 import { assert, expect } from 'chai';
 
-
 describe('./src/LoopTree.ts', () => {
-
-  // const propertiesVirtualizeTree: VirtualizeTreeProperties<DirectoryFixture> = {
-  //   isEqual: isEqualDirectory
-  // };
-
-  // let directoryTree = new VirtualizeTree(propertiesVirtualizeTree);
-
-  // const directoriesDeep1: DirectoryFixture[] = createFactoryDirectory(3, 1);
-  // const directoriesDeep2: DirectoryFixture[] = createFactoryDirectory(3, 2);
-  // const directoriesDeep3: DirectoryFixture[] = createFactoryDirectory(3, 3);
-  // const directoriesDeep4: DirectoryFixture[] = createFactoryDirectory(3, 4);
-
-  // const directoryRoot: DirectoryFixture = createFactoryDirectory(1, 0)[0];
-
-  // if(!directoryTree.root) {
-  //   directoryTree.registerRoot(directoryRoot);
-  // }
-
-  // let currentRootAppend = directoryRoot;
-
-  // let isAppendStatus = [false,false,false,false];
-
-  // [
-  //   directoriesDeep1,
-  //   directoriesDeep2,
-  //   directoriesDeep3,
-  //   directoriesDeep4
-  // ]
-  // .forEach((directoriesDeep: DirectoryFixture[], index: number): void => {
-
-  //   Promise.all(
-  //     directoriesDeep.map((directory: DirectoryFixture): Promise<boolean> => (
-  //       directoryTree.add(currentRootAppend, directory)
-  //     ))
-  //   )
-  //   .then((responses: boolean[]): void => {
-
-  //     it('should append item in tree', () => {
-  //       expect(responses).to.deep.equal([true,true,true]);
-  //     } )
-
-  //     currentRootAppend = directoriesDeep[Math.floor(Math.random() * directoriesDeep.length)];
-
-  //     isAppendStatus[index] = true;
-
-  //     if(isAppendStatus.find( status => !status ) === undefined) {
-  //       treeBuild();
-  //     }
-  //   });
-
-  // })
-
 
   const propertiesVirtualizeTree: VirtualizeTreeProperties<DirectoryFixture> = {
     isEqual: isEqualDirectory

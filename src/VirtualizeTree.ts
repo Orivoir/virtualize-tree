@@ -19,20 +19,25 @@ export type VirtualizeTreeIsEqualCallback<Item> = (i1: Item, i2: Item) => boolea
 
 export interface VirtualizeTreeContainer<Item> {
 
+  /**
+   * @var {Item} item - ref to natural item
+   */
   item: Item;
 
   /**
-   * @var {number} deep - deep level root as `0`
+   * @var {number} deep - deep level this item, root is `0`
    */
   deep: number;
 
   /**
-   * @var {Item} parent - ref to parent `item` only root should be `null`
+   * @var {Item} parent - ref to parent **container item** only root is `null`
    */
   parent: VirtualizeTreeContainer<Item> | null;
 
+  /**
+   * @var {VirtualizeTreeContainer<Item>[] | null} childrens - list of childrens **container items** for this item
+   */
   childrens: VirtualizeTreeContainer<Item>[] | null;
-
 };
 
 export default class VirtualizeTree<Item> {
@@ -151,6 +156,7 @@ export default class VirtualizeTree<Item> {
 
   }
 
+  /** @TODO write test remove method */
   public remove(item: Item): Promise<boolean> {
 
     return new Promise((resolve,reject) => {
