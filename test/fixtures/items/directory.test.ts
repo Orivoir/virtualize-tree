@@ -4,10 +4,9 @@ export interface DirectoryFixture {
   name: string;
   type: CategoryDirectoryFixture;
   size: number;
-};
+}
 
 function randomName(reference: number): string {
-
   const names: string[] = [
     "foobar",
     "lorem ipsum",
@@ -25,7 +24,6 @@ export function isEqual(d1: DirectoryFixture, d2: DirectoryFixture): boolean {
 }
 
 export default function createDirectories(times?: number | null, indexator?: number): DirectoryFixture[] {
-
   if(typeof times !== "number" || times === 0) {
     times = 5;
   } else {
@@ -37,5 +35,4 @@ export default function createDirectories(times?: number | null, indexator?: num
     type: Math.random() >= .5 ? "folder": "file",
     size: Math.floor( Math.random() * (75e5 - 1e3) ) + 1e3
   }));
-
 }

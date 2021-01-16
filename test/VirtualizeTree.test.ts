@@ -1,17 +1,15 @@
 import VirtualizeTree, {VirtualizeTreeProperties, VirtualizeTreeContainer} from './../src/VirtualizeTree';
 
 import createFactoryDirectory, {isEqual as isEqualDirectory, DirectoryFixture} from './fixtures/items/directory.test';
-import { assert, expect } from 'chai';
+import {assert, expect} from 'chai';
 
 describe('./src/VirtualizeTree.ts', () => {
-
   describe('build tree with factory directories:', () => {
-
     const propertiesVirtualizeTree: VirtualizeTreeProperties<DirectoryFixture> = {
       isEqual: isEqualDirectory
     };
 
-    let directoryTree = new VirtualizeTree(propertiesVirtualizeTree);
+    const directoryTree = new VirtualizeTree(propertiesVirtualizeTree);
 
     const directoriesDeep1: DirectoryFixture[] = createFactoryDirectory(3, 1);
     const directoriesDeep2: DirectoryFixture[] = createFactoryDirectory(3, 2);
@@ -37,42 +35,34 @@ describe('./src/VirtualizeTree.ts', () => {
       directoriesDeep4
     ]
     .forEach((directoriesDeep: DirectoryFixture[], index: number): void => {
-
       let messageIt = `should add directories deep ${(index+1)}`;
       it(messageIt, () => {
-
         return Promise.all(
           directoriesDeep.map((directoryDeep: DirectoryFixture): Promise<boolean> => (
             directoryTree.add(currentRootToAdd, directoryDeep)
           ))
         ).then((responses: boolean[]): void => {
-
           responses.forEach((response: boolean) => (
             assert.isTrue(response)
           ));
 
           currentRootToAdd = directoriesDeep[ Math.floor(Math.random() * directoriesDeep.length) ];
         });
-
       });
 
       messageIt = `should find item deep ${(index + 1)}`;
       it(messageIt, () => {
-
         return Promise.all(
           directoriesDeep.map((directoryDeep: DirectoryFixture): Promise<VirtualizeTreeContainer<DirectoryFixture> | null> => (
             directoryTree.find(directoryDeep)
           ))
         )
         .then((responses: Array<VirtualizeTreeContainer<DirectoryFixture> | null> | undefined): void => {
-
           responses?.forEach((response: VirtualizeTreeContainer<DirectoryFixture> | null, index: number): void => {
             expect(response).to.be.not.null;
             expect(response?.item).to.be.equal(directoriesDeep[index]);
           });
-
-        })
-
+        });
       });
 
       messageIt = `should not find item deep ${(index + 1)}`;
@@ -83,16 +73,12 @@ describe('./src/VirtualizeTree.ts', () => {
           ))
         )
         .then((responses: Array<VirtualizeTreeContainer<DirectoryFixture> | null> | undefined): void => {
-
           responses?.forEach((response: VirtualizeTreeContainer<DirectoryFixture> | null, index: number): void => {
             expect(response).to.be.null;
             expect(response?.item).to.be.not.equal(directoriesDeep[index]);
           });
-
-        })
-
+        });
       });
-
     });
 
 
@@ -106,5 +92,4 @@ describe('./src/VirtualizeTree.ts', () => {
 
     } );
   } );
-
 });

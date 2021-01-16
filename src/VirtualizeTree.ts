@@ -13,7 +13,7 @@ export interface VirtualizeTreeProperties<Item> {
   isEqual: VirtualizeTreeIsEqualCallback<Item>;
 
   root?: Item;
-};
+}
 
 export type VirtualizeTreeIsEqualCallback<Item> = (i1: Item, i2: Item) => boolean;
 
@@ -38,15 +38,13 @@ export interface VirtualizeTreeContainer<Item> {
    * @var {VirtualizeTreeContainer<Item>[] | null} childrens - list of childrens **container items** for this item
    */
   childrens: VirtualizeTreeContainer<Item>[] | null;
-};
+}
 
 export default class VirtualizeTree<Item> {
-
   private tree: VirtualizeTreeContainer<Item> | null = null;
   private isEqual: VirtualizeTreeIsEqualCallback<Item>;
 
   constructor(properties: VirtualizeTreeProperties<Item>) {
-
     if(!(properties.isEqual instanceof Function)) {
       throw new TypeError("property `isEqual: (i1: Item, i2: Item) => boolean` is missing, cant verify equality between items");
     }
@@ -56,23 +54,19 @@ export default class VirtualizeTree<Item> {
     if(typeof properties.root !== "undefined") {
       this.createRoot(properties.root);
     }
-
   }
 
 
   private createRoot(item: Item): void {
-
     this.tree = {
       childrens: null,
       deep: 0,
       parent: null,
       item
     };
-
   }
 
   private createVirtualizeContainer(item: Item, parent: VirtualizeTreeContainer<Item>): VirtualizeTreeContainer<Item> {
-
     return {
       childrens: null,
       deep: parent.deep + 1,
@@ -86,7 +80,6 @@ export default class VirtualizeTree<Item> {
   }
 
   public registerRoot(item: Item): void {
-
     if(this.tree !== null) {
       throw new TypeError("root has already been hydrate");
     }
@@ -95,23 +88,18 @@ export default class VirtualizeTree<Item> {
   }
 
   public async find(item: Item): Promise<VirtualizeTreeContainer<Item> | null> {
-
     if(!this.tree) {
       throw new TypeError(VirtualizeTree.ERROR_MESSAGE_NOT_ROOT_EXISTS);
     }
 
     return new Promise((
-      resolve: (result: VirtualizeTreeContainer<Item> | null) => void,
-      reject: (reason: any) => void
+      resolve: (result: VirtualizeTreeContainer<Item> | null) => void
     ): void => {
-
       if(this.tree !== null) {
-
         if(this.tree) {
           if(this.isEqual(item, this.tree.item) ) {
             resolve(this.tree);
           } else {
-
             const findItemProperties: FindItemProperties<Item> = {
               isEqual: this.isEqual,
               item,
@@ -125,22 +113,16 @@ export default class VirtualizeTree<Item> {
       } else {
         resolve(null);
       }
-
     });
-
   }
 
   public add(parent: Item, child: Item): Promise<boolean> {
-
-    return new Promise((resolve, reject): void => {
-
+    return new Promise((resolve): void => {
       this.find(parent)
       .then((parentContainer: VirtualizeTreeContainer<Item> | null) => {
-
         if(!parentContainer) {
           resolve(false);
         } else {
-
           if(!(parentContainer.childrens instanceof Array)) {
             parentContainer.childrens = [];
           }
@@ -150,36 +132,26 @@ export default class VirtualizeTree<Item> {
           );
           resolve(true);
         }
-
-      })
+      });
     });
-
   }
 
   /** @TODO write test remove method */
   public remove(item: Item): Promise<boolean> {
-
-    return new Promise((resolve,reject) => {
-
+    return new Promise((resolve) => {
       this.find(item)
       .then((itemContainer: VirtualizeTreeContainer<Item> | null): void => {
-
         if(!itemContainer) {
           resolve(false);
         } else {
-
           const parentContainer: VirtualizeTreeContainer<Item> | null = itemContainer.parent;
 
           if(!parentContainer) {
             throw new Error(`cant remove root tree`);
           } else {
-
             if(!(parentContainer.childrens instanceof Array)) {
-
               throw new Error(`internal error "child.parent.childrens" is null`);
-
             } else {
-
               const lastSize = parentContainer.childrens.length;
 
               parentContainer.childrens = parentContainer.childrens.filter((child: VirtualizeTreeContainer<Item>): boolean => (
@@ -193,16 +165,11 @@ export default class VirtualizeTree<Item> {
               } else {
                 resolve(true);
               }
-
             }
           }
-
         }
-
-      })
-
+      });
     });
-
   }
 
   public get root(): Item | null {
@@ -214,7 +181,6 @@ export default class VirtualizeTree<Item> {
   }
 
   public forEach(callback: (item: VirtualizeTreeContainer<Item>) => void, onFinish?: (maxDeep: number) => void): void {
-
     if(!this.tree) {
       throw new TypeError(VirtualizeTree.ERROR_MESSAGE_NOT_ROOT_EXISTS);
     }
@@ -275,6 +241,5 @@ export default class VirtualizeTree<Item> {
   //   // });
 
   // }
-
-};
+}
 

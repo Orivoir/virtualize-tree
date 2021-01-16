@@ -6,7 +6,7 @@ export interface NodeFixture {
   name: string;
   value: string;
   type: NodeCategoryFixture
-};
+}
 
 
 function randomName(): string {
@@ -31,7 +31,6 @@ export function isEqual(n1: NodeFixture, n2: NodeFixture): boolean {
 }
 
 export default function createDirectories(times?: number | null): NodeFixture[] {
-
   if(typeof times !== "number" || times === 0) {
     times = 5;
   } else {
@@ -44,5 +43,4 @@ export default function createDirectories(times?: number | null): NodeFixture[] 
     id: createRandomId(),
     value: `${randomName()}${createRandomId()}`
   }));
-
 }

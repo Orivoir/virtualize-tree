@@ -2,28 +2,27 @@ export interface TreeContainerIterable<ContainerItem> {
   childrens: ContainerItem[] | null;
   parent: ContainerItem | null;
   deep: number;
-};
+}
 
 export interface LoopTreeProperties<ContainerItem> {
   tree: ContainerItem;
-};
+}
 
 export default class LoopTree<ContainerItem extends TreeContainerIterable<ContainerItem>> {
-
   private tree: ContainerItem;
 
   private onFinish: (maxDeep: number) => void;
   private forEach: (item: ContainerItem) => boolean;
 
-  private maxDeep: number = 0;
-  private isManualStop: boolean = false;
+  private maxDeep = 0;
+  private isManualStop = false;
 
 
   private currentBranch: Array<ContainerItem[]> | null = null;
 
   private currentBranchAsyncIterator: ContainerItem[] | null = null;
-  private nextIndexAsyncIterator: number = 0;
-  private currentIndexAsyncIterator: number = 0;
+  private nextIndexAsyncIterator = 0;
+  private currentIndexAsyncIterator = 0;
   private nextContainerItemAsyncIterator: ContainerItem | null = null;
 
   constructor(properties: LoopTreeProperties<ContainerItem>) {
@@ -36,7 +35,6 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
 
 
   private prepare(): boolean {
-
     this.isManualStop = false;
     this.maxDeep = 0;
     this.currentBranch = null;
@@ -49,11 +47,9 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
 
       return false;
     } else {
-
       this.currentBranch = [this.tree.childrens];
       return true;
     }
-
   }
 
   private loop() {
@@ -81,27 +77,20 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
       ))
     )
     .then((): void => {
-
       if(this.isManualStop) {
-
         // last this.forEach has return false, stop loop
         this.onFinish(this.maxDeep);
-
       } else {
-
         const nextBranch: Array<ContainerItem[]> = [];
 
         this.currentBranch?.forEach((childrens: ContainerItem[]): void => {
-
           childrens.forEach((child: ContainerItem): void => {
-
             if(child.childrens instanceof Array) {
               nextBranch.push(child.childrens);
             }
             // if child.childrens is null
             // child branch is finish
-          })
-
+          });
         });
 
         this.currentBranch = nextBranch;
@@ -115,17 +104,12 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
           this.loop();
         }
       }
-
     });
-
   }
 
   private async loopChildrens(childrens: ContainerItem[]): Promise<void> {
-
-    return new Promise((resolve,reject) => {
-
+    return new Promise((resolve) => {
       childrens.forEach((children: ContainerItem): void => {
-
         if(children.deep > this.maxDeep) {
           this.maxDeep = children.deep;
         }
@@ -139,48 +123,37 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
       });
 
       resolve();
-
     });
-
   }
 
   private loopChildrensAsyncIterator(childrens: ContainerItem[]): void {
-
     for (const child of childrens) {
-
       if(this.currentIndexAsyncIterator++ === this.nextIndexAsyncIterator) {
         this.nextContainerItemAsyncIterator = child;
         this.nextIndexAsyncIterator = this.currentIndexAsyncIterator;
         break;
-      }
-      else continue;
+      } else continue;
     }
-
   }
 
   private loopAsyncIterator() {
-
     this.loopChildrensAsyncIterator((this.currentBranchAsyncIterator as ContainerItem[]));
 
     if(this.nextContainerItemAsyncIterator) {
       return;
     } else {
-
       const nextCurrentBranchAsyncIterator: ContainerItem[] = [];
 
       this.currentBranchAsyncIterator?.forEach((child: ContainerItem) => {
-
         if(child.childrens) {
           nextCurrentBranchAsyncIterator.push(...child.childrens);
         }
         // else child branch is finish
-
       });
 
       this.currentBranchAsyncIterator = nextCurrentBranchAsyncIterator;
 
       if( this.currentBranchAsyncIterator.length > 0 ) {
-
         // go next steps
         this.loopAsyncIterator();
       } else {
@@ -190,8 +163,7 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
     }
   }
 
-  public start(forEach: (item: ContainerItem) => boolean, onFinish?: (maxDeep: number) => void) {
-
+  public start(forEach: (item: ContainerItem) => boolean, onFinish?: (maxDeep: number) => void): void {
     this.forEach = forEach;
     this.onFinish = onFinish instanceof Function ? onFinish: this.onFinish;
 
@@ -206,15 +178,12 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
     }
   }
 
-  [Symbol.asyncIterator]() {
-
+  [Symbol.asyncIterator](): AsyncIterator<ContainerItem> {
     return {
 
       next: () => {
-
-        if(!this.tree.childrens) return Promise.resolve({ value: this.tree, done: true });
+        if(!this.tree.childrens) return Promise.resolve({value: this.tree, done: true});
         else {
-
           this.currentIndexAsyncIterator = 0;
 
           this.currentBranchAsyncIterator = this.tree.childrens;
@@ -223,11 +192,8 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
           this.loopAsyncIterator();
 
           if(this.nextContainerItemAsyncIterator) {
-
             return Promise.resolve({value: this.nextContainerItemAsyncIterator, done: false});
-
           } else {
-
             this.currentBranchAsyncIterator = null;
             this.nextContainerItemAsyncIterator = null;
             this.currentIndexAsyncIterator = 0;
@@ -235,12 +201,8 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
 
             return Promise.resolve({value: this.tree, done: true});
           }
-
         }
-
       }
-    }
+    };
   }
-
-
-};
+}
