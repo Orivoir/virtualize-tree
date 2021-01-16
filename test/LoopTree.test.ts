@@ -61,8 +61,6 @@ describe('./src/LoopTree.ts', () => {
 
       const loopTreeProperties: LoopTreeProperties<VirtualizeTreeContainer<DirectoryFixture>> = {
         tree: directoryTree.containerRoot,
-        resolve: () => {},
-        forEach: () => { return true; }
       };
 
       const looping = new LoopTree(loopTreeProperties);

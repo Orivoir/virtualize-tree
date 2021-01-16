@@ -6,15 +6,15 @@ export interface TreeContainerIterable<ContainerItem> {
 
 export interface LoopTreeProperties<ContainerItem> {
   tree: ContainerItem;
-  forEach(item: ContainerItem): boolean;
-  resolve(maxDeep: number): void;
 };
 
 export default class LoopTree<ContainerItem extends TreeContainerIterable<ContainerItem>> {
 
   private tree: ContainerItem;
-  private resolve: (maxDeep: number) => void;
+
+  private onFinish: (maxDeep: number) => void;
   private forEach: (item: ContainerItem) => boolean;
+
   private maxDeep: number = 0;
   private isManualStop: boolean = false;
 
@@ -28,8 +28,10 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
 
   constructor(properties: LoopTreeProperties<ContainerItem>) {
     this.tree = properties.tree;
-    this.resolve = properties.resolve;
-    this.forEach = properties.forEach;
+
+    this.forEach = () => true;
+    this.onFinish = () => null;
+    // this.forEach = properties.forEach;
   }
 
 
@@ -43,7 +45,7 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
 
     if(this.tree.childrens === null) {
       // tree is empty
-      this.resolve(this.maxDeep);
+      this.onFinish(this.maxDeep);
 
       return false;
     } else {
@@ -55,7 +57,6 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
   }
 
   private loop() {
-
     /*
     asynchrone loop of current steps tree:
 
@@ -84,7 +85,7 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
       if(this.isManualStop) {
 
         // last this.forEach has return false, stop loop
-        this.resolve(this.maxDeep);
+        this.onFinish(this.maxDeep);
 
       } else {
 
@@ -108,7 +109,7 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
         if(this.currentBranch.length === 0) {
           // loop tree is finish
           this.currentBranch = null;
-          this.resolve(this.maxDeep);
+          this.onFinish(this.maxDeep);
         } else {
           // go next branch
           this.loop();
@@ -189,7 +190,10 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
     }
   }
 
-  public start() {
+  public start(forEach: (item: ContainerItem) => boolean, onFinish?: (maxDeep: number) => void) {
+
+    this.forEach = forEach;
+    this.onFinish = onFinish instanceof Function ? onFinish: this.onFinish;
 
     const isAccepted: boolean = this.prepare();
 

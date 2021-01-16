@@ -220,17 +220,18 @@ export default class VirtualizeTree<Item> {
     }
 
     const loopTreeProperties: LoopTreeProperties<VirtualizeTreeContainer<Item>> = {
-      tree: this.tree,
-      resolve: onFinish instanceof Function ? onFinish: () => {},
-      forEach: (item: VirtualizeTreeContainer<Item>): boolean => {
-        callback(item);
-        return true;
-      }
+      tree: this.tree
     };
 
     const looping = new LoopTree(loopTreeProperties);
 
-    looping.start();
+    looping.start(
+      (item: VirtualizeTreeContainer<Item>): boolean => {
+        callback(item);
+        return true;
+      },
+      onFinish
+    );
   }
 
   // public createSnapshot() {

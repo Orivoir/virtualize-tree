@@ -25,7 +25,10 @@ export default class FindItem<Item> {
 
     const loopTreeProperties: LoopTreeProperties<VirtualizeTreeContainer<Item>> = {
       tree: this.tree,
-      forEach: (currentItem: VirtualizeTreeContainer<Item>) => {
+    };
+
+    new LoopTree(loopTreeProperties).start(
+      (currentItem: VirtualizeTreeContainer<Item>) => {
 
         if( this.isEqual(currentItem.item, this.item) ) {
           this.isAlreadyResolve = true;
@@ -39,7 +42,7 @@ export default class FindItem<Item> {
         return true;
 
       },
-      resolve: () => {
+      () => {
         // has finish loop tree
         if(!this.isAlreadyResolve) {
           // has not find item
@@ -47,9 +50,7 @@ export default class FindItem<Item> {
         }
         // else has already call resolve from forEach
       }
-    };
-
-    new LoopTree(loopTreeProperties).start();
+    );
   }
 
 

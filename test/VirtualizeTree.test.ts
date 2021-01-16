@@ -1,6 +1,5 @@
 import VirtualizeTree, {VirtualizeTreeProperties, VirtualizeTreeContainer} from './../src/VirtualizeTree';
 
-import createFactoryNode, {isEqual as isEqualNode} from './fixtures/items/node.test';
 import createFactoryDirectory, {isEqual as isEqualDirectory, DirectoryFixture} from './fixtures/items/directory.test';
 import { assert, expect } from 'chai';
 
