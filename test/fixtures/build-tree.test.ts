@@ -1,4 +1,4 @@
-import VirtualizeTree, {VirtualizeTreeProperties, VirtualizeTreeContainer} from './../../src/VirtualizeTree';
+import VirtualizeTree, {VirtualizeTreeProperties} from './../../src/VirtualizeTree';
 import {DirectoryFixture} from './items/directory.test';
 import {NodeFixture} from './items/node.test';
 
@@ -12,11 +12,10 @@ export interface BuildTreeFixtureProperties<Item> {
   };
   creator: CreatorCallback<Item>;
   mute: boolean;
-};
+}
 
 export default class BuildTreeFixture<Item = DirectoryFixture | NodeFixture> {
-
-  private mute: boolean = false;
+  private mute = false;
   private tree: VirtualizeTree<Item>;
   private isEqual: (i1: Item, i2: Item) => boolean;
 
@@ -26,12 +25,11 @@ export default class BuildTreeFixture<Item = DirectoryFixture | NodeFixture> {
   private randomItemsByDeep: number;
 
 
-  private currentCreateItems: number = 0;
-  private indexDeep: number = 0;
+  private currentCreateItems = 0;
+  private indexDeep = 0;
   private currentRoot: Item | null = null;
 
   constructor(properties: BuildTreeFixtureProperties<Item>) {
-
     this.isEqual = properties.isEqual;
     this.mute = properties.mute;
 
@@ -46,7 +44,6 @@ export default class BuildTreeFixture<Item = DirectoryFixture | NodeFixture> {
   }
 
   private get tabString() {
-
     let current = "";
     Array.from(Array(this.indexDeep).keys()).map(() => current += "    ");
 
@@ -54,8 +51,7 @@ export default class BuildTreeFixture<Item = DirectoryFixture | NodeFixture> {
   }
 
   private async start(onFinish: (countCreateItems: number) => void) {
-
-    let currentRootLocal: Item | null = this.currentRoot;
+    const currentRootLocal: Item | null = this.currentRoot;
 
     const items: Item[] = this.creator(this.randomItemsByDeep, this.indexDeep);
     let items2: Item[] = [];
@@ -63,14 +59,12 @@ export default class BuildTreeFixture<Item = DirectoryFixture | NodeFixture> {
     if(!this.mute) console.log("root:");
 
     for (let i = 0; i < this.randomItemsByDeep; i++) {
-
       await this.tree.add((currentRootLocal as Item), items[i]);
       this.currentCreateItems++;
       if(!this.mute) console.log(`${this.tabString}${this.indexDeep}`);
 
       this.indexDeep++;
       for(let j = 0; j < this.randomItemsByDeep; j++) {
-
         items2 = this.creator(this.randomItemsByDeep, this.indexDeep);
 
         await this.tree.add(items[i], items2[j]);
@@ -79,7 +73,6 @@ export default class BuildTreeFixture<Item = DirectoryFixture | NodeFixture> {
 
         this.indexDeep++;
         for(let k = 0; k < this.randomItemsByDeep; k++) {
-
           const items3 = this.creator(this.randomItemsByDeep, this.indexDeep);
 
           await this.tree.add(items2[j], items3[k]);
@@ -88,7 +81,6 @@ export default class BuildTreeFixture<Item = DirectoryFixture | NodeFixture> {
 
           this.indexDeep++;
           for(let l = 0; l < this.randomItemsByDeep; l++) {
-
             const items4 = this.creator(this.randomItemsByDeep, this.indexDeep);
 
             await this.tree.add(items3[k], items4[l]);
@@ -96,7 +88,6 @@ export default class BuildTreeFixture<Item = DirectoryFixture | NodeFixture> {
             if(!this.mute) console.log(`${this.tabString}${this.indexDeep}`);
           }
           this.indexDeep--;
-
         }
         this.indexDeep--;
       }
@@ -107,7 +98,6 @@ export default class BuildTreeFixture<Item = DirectoryFixture | NodeFixture> {
   }
 
   private prepare() {
-
     this.currentCreateItems = 0;
     this.indexDeep = 0;
 
@@ -121,23 +111,18 @@ export default class BuildTreeFixture<Item = DirectoryFixture | NodeFixture> {
 
 
   public create(): Promise<{tree: VirtualizeTree<Item>, countItems: number}> {
-
     this.prepare();
 
     return new Promise((
       resolve
     ) => {
-
       this.start((countCreateItems: number) => {
         if(!this.mute) console.log("has create ", countCreateItems, " items");
         resolve({
           tree: this.tree,
           countItems: countCreateItems
-        })
+        });
       });
-
-    })
-
+    });
   }
-
-};
+}

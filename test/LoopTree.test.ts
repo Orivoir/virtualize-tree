@@ -1,15 +1,13 @@
-import VirtualizeTree, {VirtualizeTreeProperties, VirtualizeTreeContainer} from './../src/VirtualizeTree';
+import VirtualizeTree, {VirtualizeTreeContainer} from './../src/VirtualizeTree';
 import LoopTree, {LoopTreeProperties} from './../src/LoopTree';
 import BuildTree, {BuildTreeFixtureProperties} from './fixtures/build-tree.test';
 
-import createNodeFixtures, {isEqual as isEqualNodes,NodeFixture} from './fixtures/items/node.test';
+import createNodeFixtures, {isEqual as isEqualNodes, NodeFixture} from './fixtures/items/node.test';
 
 import {expect} from 'chai';
 
 describe('./src/LoopTree.ts', () => {
-
   it('should loop tree deep 4 with 2 item by deep level with for...await', () => {
-
     const buildTreeFixtureProperties: BuildTreeFixtureProperties<NodeFixture> = {
       creator: createNodeFixtures,
       isEqual: isEqualNodes,
@@ -24,7 +22,6 @@ describe('./src/LoopTree.ts', () => {
 
     return buildTreeFixture.create()
     .then(async (result: {tree: VirtualizeTree<NodeFixture>, countItems: number}): Promise<void> => {
-
       if(result.tree.containerRoot === null) {
         throw new TypeError('root tree is null');
       }
@@ -37,22 +34,20 @@ describe('./src/LoopTree.ts', () => {
 
       let itemFind = 0;
 
+      /* eslint-disable */
       for await(const node of looper) {
+      /* eslint-enable */
         itemFind++;
       }
 
       expect(itemFind).to.be.equal(result.countItems);
-
-
     })
     .catch(error => {
       throw new Error(error);
-    })
-
+    });
   });
 
   it('should loop tree deep 4 with 3 item by deep level with callback system', () => {
-
     const buildTreeFixtureProperties: BuildTreeFixtureProperties<NodeFixture> = {
       creator: createNodeFixtures,
       isEqual: isEqualNodes,
@@ -67,7 +62,6 @@ describe('./src/LoopTree.ts', () => {
 
     return buildTreeFixture.create()
     .then(async (result: {tree: VirtualizeTree<NodeFixture>, countItems: number}) => {
-
       if(result.tree.containerRoot === null) {
         throw new TypeError('root tree is null');
       }
@@ -80,11 +74,9 @@ describe('./src/LoopTree.ts', () => {
 
       let directoryFind = 0;
 
-      return new Promise((resolve, reject: (reason: any) => void) => {
-
+      return new Promise((resolve, reject: (reason: Error) => void) => {
         looper.start(
-          (node: VirtualizeTreeContainer<NodeFixture>): boolean => {
-
+          (): boolean => {
             directoryFind++;
             // continue loop
             return true;
@@ -100,14 +92,10 @@ describe('./src/LoopTree.ts', () => {
             resolve(null);
           }
         );
-
       })
       .catch(error => {
         throw new Error(error);
-      })
-
-    })
-
+      });
+    });
   } );
-
 } );

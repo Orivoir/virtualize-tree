@@ -6,9 +6,7 @@ import BuildTreeFixture, {BuildTreeFixtureProperties} from './fixtures/build-tre
 import VirtualizeTree from '../src/VirtualizeTree';
 
 describe('build tree fixtures', () => {
-
   it('should build tree deep 4 with 2 item by deep level', () => {
-
     const buildTreeFixtureProperties: BuildTreeFixtureProperties<NodeFixture> = {
       creator: createNodes,
       itemsByDeep: {
@@ -23,7 +21,6 @@ describe('build tree fixtures', () => {
 
     return buildTreeFixture.create()
     .then((result: {tree: VirtualizeTree<NodeFixture>}): void => {
-
       const {tree} = result;
 
       assert.isObject(tree);
@@ -38,15 +35,10 @@ describe('build tree fixtures', () => {
       }
 
       childs.forEach(child => {
-
         assert.isObject(child);
         assert.isArray(child.childrens);
         expect(child.childrens).to.have.lengthOf(2);
-
       });
-
     });
-
   } );
-
 });
