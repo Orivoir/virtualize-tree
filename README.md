@@ -253,7 +253,7 @@ const looper = new LoopTree(loopTreeProperties);
 
 (async () => {
 
-  for(const wrapDirectory of looper) {
+  for await(const wrapDirectory of looper) {
 
     // wrapDirectory: VirtualizeTreeContainer<Directory>
     console.log(wrapDirectory);
