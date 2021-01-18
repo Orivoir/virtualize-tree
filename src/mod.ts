@@ -1,5 +1,13 @@
-import * as LoopTreeContent from './LoopTree';
-import * as VirtualizeTreeContent from './VirtualizeTree';
+import LoopTree, {LoopTreeProperties, TreeContainerIterable} from './LoopTree';
+import VirtualizeTree, {VirtualizeTreeContainer, VirtualizeTreeIsEqualCallback, VirtualizeTreeProperties} from './VirtualizeTree';
 
-export const LoopTree = LoopTreeContent;
-export const VirtualizeTree = VirtualizeTreeContent;
+export {
+  LoopTree,
+  LoopTreeProperties,
+  TreeContainerIterable,
+
+  VirtualizeTree,
+  VirtualizeTreeContainer,
+  VirtualizeTreeIsEqualCallback,
+  VirtualizeTreeProperties
+};

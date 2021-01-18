@@ -9,6 +9,8 @@ Virtualize tree data for of directories, nodes or any other data type this libra
 - [add root tree](#add-root-tree)
 - [add item into tree](#add-item-into-tree)
 - [find item](#find-item)
+- [update item](#update-item)
+- [remove item](#remove-item)
 - [loop tree](#loop-tree)
 
 ### installation
@@ -22,7 +24,7 @@ npm i --save virtualize-tree
 
 #### Typescript
 ```ts
-import VirtualizeTree, {VirtualizeTreeProperties} from 'virtualize-tree';
+import {VirtualizeTree, VirtualizeTreeProperties} from 'virtualize-tree';
 
 interface Directory {
   name: string;
@@ -42,7 +44,7 @@ const directoryTree = new VirtualizeTree(propertiesVirtualizeTree);
 
 #### JavaScript
 ```js
-import VirtualizeTree from 'virtualize-tree';
+import {VirtualizeTree} from 'virtualize-tree';
 
 const propertiesVirtualizeTree = {
 
@@ -57,7 +59,7 @@ const directoryTree = new VirtualizeTree(propertiesVirtualizeTree);
 
 #### Javascript (CommonJS)
 ```js
-const VirtualizeTree = require('virtualize-tree');
+const {VirtualizeTree} = require('virtualize-tree');
 
 const propertiesVirtualizeTree = {
 
@@ -104,7 +106,7 @@ directoryTree.add(directoryRoot, firstDirectory)
 });
 ```
 
-# find item
+### find item
 
 the Virtualize tree use a wrap for add the items into tree during a find item or during a loop of tree, you receive the wrap of item that is a `VirtualizeTreeContainer`
 
@@ -158,16 +160,92 @@ directoryTree.find(directoryToSearch)
 
 ```
 
-## loop tree
+### update item
+
+```ts
+
+const lastDirectory: Directory = {
+  name: "foobar",
+  size: 42
+};
+
+directoryTree.update(lastDirectory, {
+  name: "new foobar",
+  size: 43
+})
+.then((hasChange: boolean): void => {
+
+  if(hasChange) {
+    console.log('last directory has been update');
+  } else {
+    console.log('last directory not exists into tree')
+  }
+});
+
+```
+
+Note: the `update` method should be use as long as **not know** if item to update exists into tree,
+else **update directly** property `item` of `VirtualizeTreeContainer<Item>` the update are apply into tree by **object reference**
+
+```ts
+
+directoryTree.find({
+  name: "foobar",
+  size: 42
+})
+.then((directory: VirtualizeTreeContainer<Directory> | null): void => {
+
+  if(directory) {
+
+    directory.item = {
+      name: "new foobar",
+      size: 43
+    };
+
+  } else {
+    console.log(`${directory.name} not exists into tree`);
+  }
+
+});
+
+```
+
+### remove item
+
+Can remove any item of tree from method `remove(item: Item): Promise<boolean>`
+during remove a item VirtualizeTree use `isEqual` callback from properties of constructor for verify equality between 2 items.
+
+```ts
+
+const directoryToRemove: Directory = {
+
+  name: "foobar",
+  size: 42
+};
+
+directoryTree.remove(directoryToRemove)
+.then((hasRemove: boolean): void => {
+
+  if(hasRemove) {
+    console.log(`directory ${directoryToRemove.name} has been remove of tree`);
+  } else {
+    console.log(`directory ${directoryToRemove.name} has not been find into tree`);
+  }
+
+});
+
+```
+
+### loop tree
 
 VirtualizeTree provide a generic class for loop a tree (`LoopTree`) that implement [Symbol.asyncIterator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for-await...of) method, from `async function` you can use `for...await` loop with instance of `LoopTree`
 
 ```ts
 
-import LoopTree, {LoopTreeProperties} from 'virtualize-tree/LoopTree';
+import {LoopTree, LoopTreeProperties} from 'virtualize-tree/LoopTree';
 
 
-const loopTreeProperties: LoopTreeProperties<VirtualizeTreeContainer<DirectoryFixture>> = {
+const loopTreeProperties: LoopTreeProperties<VirtualizeTreeContainer<Directory>> = {
   tree: directoryTree.containerRoot
 };
 
@@ -177,10 +255,25 @@ const looper = new LoopTree(loopTreeProperties);
 
   for(const wrapDirectory of looper) {
 
-    // wrapDirectory: VirtualizeTreeContainer<DirectoryFixture>
+    // wrapDirectory: VirtualizeTreeContainer<Directory>
     console.log(wrapDirectory);
+
+    const directory: Directory = wrapDirectory.item;
   }
 
 })();
+
+```
+
+Alternative way loop the tree directly from instance of tree is use method `foreach(callback: (item: VirtualizeTreeContainer<Item>) => void): void`
+
+```ts
+
+directoryTree.forEach((wrapDirectory: VirtualizeTreeContainer<Directory>): void => {
+
+  const directory: Directory = wrapDirectory.item;
+
+  /* ... */
+});
 
 ```
