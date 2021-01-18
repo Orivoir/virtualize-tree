@@ -1,79 +1,101 @@
-import VirtualizeTree, {VirtualizeTreeProperties, VirtualizeTreeContainer} from './../src/VirtualizeTree';
+import VirtualizeTree, {VirtualizeTreeContainer} from './../src/VirtualizeTree';
 import LoopTree, {LoopTreeProperties} from './../src/LoopTree';
+import BuildTree, {BuildTreeFixtureProperties} from './fixtures/build-tree.test';
 
-import createFactoryDirectory, {isEqual as isEqualDirectory, DirectoryFixture} from './fixtures/items/directory.test';
-import {assert, expect} from 'chai';
+import createNodeFixtures, {isEqual as isEqualNodes, NodeFixture} from './fixtures/items/node.test';
+
+import {expect} from 'chai';
 
 describe('./src/LoopTree.ts', () => {
-  const propertiesVirtualizeTree: VirtualizeTreeProperties<DirectoryFixture> = {
-    isEqual: isEqualDirectory
-  };
+  it('should loop tree deep 4 with 2 item by deep level with for...await', () => {
+    const buildTreeFixtureProperties: BuildTreeFixtureProperties<NodeFixture> = {
+      creator: createNodeFixtures,
+      isEqual: isEqualNodes,
+      itemsByDeep: {
+        min: 2,
+        max: 2
+      },
+      mute: true
+    };
 
-  const directoryTree = new VirtualizeTree(propertiesVirtualizeTree);
+    const buildTreeFixture = new BuildTree(buildTreeFixtureProperties);
 
-  const directoriesDeep1: DirectoryFixture[] = createFactoryDirectory(3, 1);
-  const directoriesDeep2: DirectoryFixture[] = createFactoryDirectory(3, 2);
-  const directoriesDeep3: DirectoryFixture[] = createFactoryDirectory(3, 3);
-  const directoriesDeep4: DirectoryFixture[] = createFactoryDirectory(3, 4);
-
-  const rootDirectory: DirectoryFixture = createFactoryDirectory(1, 0)[0];
-
-  it('should hydrate tree root', () => {
-    if(!directoryTree.root) {
-      directoryTree.registerRoot(rootDirectory);
-    }
-    expect(rootDirectory).to.be.equal(directoryTree.root);
-  });
-
-  let currentRootToAdd = rootDirectory;
-
-  [
-    directoriesDeep1,
-    directoriesDeep2,
-    directoriesDeep3,
-    directoriesDeep4
-  ]
-  .forEach((directoriesDeep: DirectoryFixture[], index: number): void => {
-    const messageIt = `should add directories deep ${(index+1)}`;
-    it(messageIt, () => {
-      return Promise.all(
-        directoriesDeep.map((directoryDeep: DirectoryFixture): Promise<boolean> => (
-          directoryTree.add(currentRootToAdd, directoryDeep)
-        ))
-      ).then((responses: boolean[]): void => {
-        responses.forEach((response: boolean) => (
-          assert.isTrue(response)
-        ));
-        currentRootToAdd = directoriesDeep[ Math.floor(Math.random() * directoriesDeep.length) ];
-      });
-    });
-
-    it('should loop with Symbol.asyncIterator (for...await)', () => {
-      if(!directoryTree.containerRoot) {
-        throw TypeError('root tree is not hydrate');
+    return buildTreeFixture.create()
+    .then(async (result: {tree: VirtualizeTree<NodeFixture>, countItems: number}): Promise<void> => {
+      if(result.tree.containerRoot === null) {
+        throw new TypeError('root tree is null');
       }
 
-      const loopTreeProperties: LoopTreeProperties<VirtualizeTreeContainer<DirectoryFixture>> = {
-        tree: directoryTree.containerRoot
+      const loopTreeProperties: LoopTreeProperties<VirtualizeTreeContainer<NodeFixture>> = {
+        tree: result.tree.containerRoot
       };
 
-      const looping = new LoopTree(loopTreeProperties);
+      const looper = new LoopTree(loopTreeProperties);
 
-      (async () => {
-        const startAt = Date.now();
+      let itemFind = 0;
 
-        for await(const wrap of looping) {
-          assert.isObject(wrap);
-          assert.isObject(wrap.item);
-          assert.isNumber(wrap.deep);
+      /* eslint-disable */
+      for await(const node of looper) {
+      /* eslint-enable */
+        itemFind++;
+      }
 
-          assert.isString(wrap.item.name);
-          assert.isString(wrap.item.type);
-          assert.isNumber(wrap.item.size);
-        }
-
-        console.log(`> tree loop in ${Date.now()-startAt}ms tree deep ${index+1} (${directoriesDeep.length * (index+1)} items)`);
-      })();
+      expect(itemFind).to.be.equal(result.countItems);
+    })
+    .catch(error => {
+      throw new Error(error);
     });
   });
+
+  it('should loop tree deep 4 with 3 item by deep level with callback system', () => {
+    const buildTreeFixtureProperties: BuildTreeFixtureProperties<NodeFixture> = {
+      creator: createNodeFixtures,
+      isEqual: isEqualNodes,
+      itemsByDeep: {
+        min: 3,
+        max: 3
+      },
+      mute: true
+    };
+
+    const buildTreeFixture = new BuildTree(buildTreeFixtureProperties);
+
+    return buildTreeFixture.create()
+    .then(async (result: {tree: VirtualizeTree<NodeFixture>, countItems: number}) => {
+      if(result.tree.containerRoot === null) {
+        throw new TypeError('root tree is null');
+      }
+
+      const loopTreeProperties: LoopTreeProperties<VirtualizeTreeContainer<NodeFixture>> = {
+        tree: result.tree.containerRoot
+      };
+
+      const looper = new LoopTree(loopTreeProperties);
+
+      let directoryFind = 0;
+
+      return new Promise((resolve, reject: (reason: Error) => void) => {
+        looper.start(
+          (): boolean => {
+            directoryFind++;
+            // continue loop
+            return true;
+          },
+          (maxDeep: number) => {
+            if(directoryFind !== result.countItems) {
+              reject(new Error(`has not find all items should: ${directoryFind}, has: ${result.countItems}`));
+            }
+            if(maxDeep !== 4) {
+              reject(new Error(`max deep find should be 4 and have find ${maxDeep}`));
+            }
+
+            resolve(null);
+          }
+        );
+      })
+      .catch(error => {
+        throw new Error(error);
+      });
+    });
+  } );
 } );

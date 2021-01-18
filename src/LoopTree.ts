@@ -39,7 +39,8 @@ export default class LoopTree<ContainerItem extends TreeContainerIterable<Contai
     this.maxDeep = 0;
     this.currentBranch = null;
 
-    this.forEach(this.tree);
+    // not render root during loop tree
+    // this.forEach(this.tree);
 
     if(this.tree.childrens === null) {
       // tree is empty
