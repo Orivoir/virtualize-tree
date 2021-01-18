@@ -136,7 +136,24 @@ export default class VirtualizeTree<Item> {
     });
   }
 
-  /** @TODO write test remove method */
+  public update(lastItem: Item, newItem: Item): Promise<boolean> {
+    return new Promise((
+      resolve: (hasUpdate: boolean) => void
+    ) => {
+      this.find(lastItem)
+      .then((wrapLastItem: VirtualizeTreeContainer<Item> | null): void => {
+        if(wrapLastItem === null) {
+          // item to update not exists into tree
+          resolve(false);
+        } else {
+          wrapLastItem.item = newItem;
+          resolve(true);
+        }
+      })
+      .catch(() => resolve(false));
+    });
+  }
+
   public remove(item: Item): Promise<boolean> {
     return new Promise((resolve) => {
       this.find(item)

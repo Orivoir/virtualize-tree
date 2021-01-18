@@ -79,4 +79,35 @@ describe('./src/VirtualizeTree.ts', () => {
     const childFind: VirtualizeTreeContainer<DirectoryFixture> | null = await tree.find(child.item);
     expect(childFind).to.be.equal(null);
   } );
+
+  it('should update item into tree', async () => {
+    if(tree === null || tree.containerRoot === null || tree.containerRoot.childrens === null) {
+      throw new TypeError('tree has not been create');
+    }
+
+    const child: VirtualizeTreeContainer<DirectoryFixture> = tree.containerRoot.childrens[0];
+
+    if(child === null) {
+      throw new TypeError('tree has not been hydrate');
+    }
+
+    const newChild: DirectoryFixture = {
+      name: "new child name",
+      size: -1,
+      type: "folder"
+    };
+
+    const copyLastItem = Object.assign({}, child.item);
+
+    const hasBeenChange: boolean = await tree.update(child.item, newChild);
+    expect(hasBeenChange).to.be.equal(true);
+
+    // cant use find last item with: child.item because child.item has been update by ref object
+    const findLastItem: VirtualizeTreeContainer<DirectoryFixture> | null = await tree.find(copyLastItem);
+    expect(findLastItem).to.be.equal(null);
+
+    const findNewItem: VirtualizeTreeContainer<DirectoryFixture> | null = await tree.find(newChild);
+    expect(findNewItem).to.be.not.equal(null);
+    expect(findNewItem?.item).to.be.equal(newChild);
+  });
 });
