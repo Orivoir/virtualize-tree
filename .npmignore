@@ -1,0 +1,6 @@
+.eslintignore
+.eslintrc
+.gitignore
+tsconfig.json
+/test
+/src
